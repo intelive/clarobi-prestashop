@@ -28,8 +28,8 @@ abstract class ClarobiApiAuthModuleFrontController extends ModuleFrontController
 
         if (!$this->isAuthorized()) {
             $response = [
-                'status' => 401,
-                'message' => 'Unauthorized: Invalid security token!'
+                'status' => 'error',
+                'error' => 'Unauthorized: Invalid security token!'
             ];
             die(json_encode($response));
         }
@@ -55,10 +55,9 @@ abstract class ClarobiApiAuthModuleFrontController extends ModuleFrontController
             ClaroLogger::errorLog(__METHOD__. ' : API_KEY (token) not found in database (configuration)');
             return false;
         }
-
         if (trim($token) != trim($authToken)) {
             ClaroLogger::errorLog(__METHOD__. " : Claro feed request with invalid security token: " . $authToken .
-             "compared to stored token: " . $token);
+             " compared to stored token: " . $token);
             return false;
         }
         return true;

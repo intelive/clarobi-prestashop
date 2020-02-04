@@ -38,13 +38,14 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
     public function init()
     {
         parent::init();
+
         try {
             $this->webService = new PrestaShopWebservice($this->shopDomain, $this->webServiceKey, self::DEBUG);
-        } catch (PrestaShopWebserviceException $e) {
-            ClaroLogger::errorLog(__METHOD__. ' : '. $e->getMessage());
+        } catch (Exception $exception) {
+            ClaroLogger::errorLog(__METHOD__. ' : '. $exception->getMessage());
             $this->json = [
                 'status' => 'error',
-                'message' => $e->getMessage()
+                'error' => $exception->getMessage()
             ];
             die(json_encode($this->json));
         }
@@ -71,16 +72,17 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
             $this->collection = json_decode($this->webService->get([
                 'url' => $this->utils->createUrlWithQuery($this->url, $this->params)
             ]));
-        } catch (PrestaShopWebserviceException $e) {
-            ClaroLogger::errorLog(__METHOD__. ' : '. $e->getMessage());
+        } catch (Exception $exception) {
+            ClaroLogger::errorLog(__METHOD__. ' : '. $exception->getMessage());
 
-            $this->json = ['status' => 'error',
-                'message' => $e->getMessage()
+            $this->json = [
+                'status' => 'error',
+                'error' => $exception->getMessage()
             ];
             die(json_encode($this->json));
         }
 
-        // Output collection in specific class
+        // Output collection in derived class
     }
 
     /**

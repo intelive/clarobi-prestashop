@@ -49,16 +49,18 @@ class ClarobiDataCountersModuleFrontController extends ClarobiApiModuleFrontCont
         foreach ($this->sql as $key => $query) {
             try {
                 $result = Db::getInstance()->executeS($query);
-                $this->json[$key] = $result[0][$key];
-            } catch (PrestaShopDatabaseException $e) {
-                error_log('DatabaseException: ' . $e->getMessage() . ' in ' . __METHOD__,
+                if(isset($result)){
+                    $this->json[$key] = $result[0][$key];
+                }
+            } catch (PrestaShopDatabaseException $exception) {
+                error_log('DatabaseException: ' . $exception->getMessage() . ' in ' . __METHOD__,
                     3,
                     _PS_MODULE_DIR_ . 'clarobi/errors.log'
                 );
 
                 $this->json = [
                     'status' => 'error',
-                    'message' => $e->getMessage()
+                    'error' => $exception->getMessage()
                 ];
                 die(json_encode($this->json));
             }

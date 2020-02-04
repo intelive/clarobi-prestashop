@@ -41,10 +41,10 @@ class ClarobiProductCountersModuleFrontController extends ClarobiApiModuleFrontC
                     Db::getInstance()->execute($sql);
                 }
             }
-        } catch (PrestaShopDatabaseException $e) {
+        } catch (PrestaShopDatabaseException $exception) {
             $this->json = [
                 'status' => 'error',
-                'message' => $e->getMessage()
+                'error' => $exception->getMessage()
             ];
             die(json_encode($this->json));
         }
