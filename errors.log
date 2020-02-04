@@ -1,0 +1,7 @@
+
+ClarobiApiModuleFrontController::initContent : This call to PrestaShop Web Services returned an unexpected HTTP status of:301( 2020-01-27 17:03:32 )
+ClarobiApiAuthModuleFrontController::isAuthorized : Claro feed request with invalid security token: A2TYKBS77HJBK2DJXSG9ENKU9KAQGKWGcompared to stored token: SGDJSDHA77B23123NMC( 2020-01-27 17:06:14 )
+ClarobiApiAuthModuleFrontController::isAuthorized : Claro feed request with invalid security token: A2TYKBS77HJBK2DJXSG9ENKU9KAQGKWGcompared to stored token: SGDJSDHA77B23123NMC( 2020-01-27 17:27:56 )
+ClarobiApiAuthModuleFrontController::isAuthorized : Claro feed request with invalid security token: A2TYKBS77HJBK2DJXSG9ENKU9KAQGKWGcompared to stored token: SGDJSDHA77B23123NMC( 2020-01-27 17:28:27 )
+ClarobiApiAuthModuleFrontController::isAuthorized : Claro feed request with invalid security token: A2TYKBS77HJBK2DJXSG9ENKU9KAQGKWGcompared to stored token: SGDJSDHA77B23123NMC( 2020-01-27 17:28:58 )
+ClarobiApiModuleFrontController::initContent : This call to PrestaShop Web Services returned an unexpected HTTP status of:301( 2020-01-27 17:35:22 )

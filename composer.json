@@ -1,0 +1,24 @@
+{
+  "name": "clarobi/presta",
+  "description": "PrestaShop module for ClaroBi analytics",
+  "homepage": "https://clarobi.com/",
+  "license": "",
+  "authors": [
+    {
+      "name": "Interlive Metrics",
+      "email": "eddie.dumitrescu@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "clarobi\\src\\Controller\\": "src/Controller/"
+    }
+  },
+  "config": {
+    "prepend-autoloader": false
+  },
+  "type": "prestashop-module"
+}
