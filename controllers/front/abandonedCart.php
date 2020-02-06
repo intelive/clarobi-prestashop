@@ -6,6 +6,7 @@ class ClarobiAbandonedCartModuleFrontController extends ClarobiApiModuleFrontCon
 {
     protected $orders;
     protected $orderCartId;
+    protected $collItems;
 
     /**
      * ClarobiAbandonedCartsModuleFrontController constructor.
@@ -14,6 +15,7 @@ class ClarobiAbandonedCartModuleFrontController extends ClarobiApiModuleFrontCon
     {
         parent::__construct();
         $this->url = $this->shopDomain . '/api/carts';
+        $this->collItems = 0;
     }
 
     /**
@@ -37,6 +39,12 @@ class ClarobiAbandonedCartModuleFrontController extends ClarobiApiModuleFrontCon
             'output_format' => 'JSON'
         ];
 
+        // Get last id to know where to stop
+        $lastId = 0;
+        $sql = 'SELECT c.id_cart FROM ps_cart c
+                    WHERE c.id_cart NOT IN (SELECT o.id_cart FROM ps_orders o)
+                    ORDER BY c.id_cart DESC LIMIT 1';
+
         try {
             $this->orders = json_decode($this->webService->get([
                 'url' => $this->utils->createUrlWithQuery($this->shopDomain . '/api/orders', $getCartIdFromOrders)
@@ -47,24 +55,39 @@ class ClarobiAbandonedCartModuleFrontController extends ClarobiApiModuleFrontCon
                 $this->orderCartId[] = $order->id_cart;
             }
 
-            foreach ($this->collection->carts as $cart) {
-                // Get all carts that were not transformed into orders.
-                if (!in_array($cart->id, $this->orderCartId)) {
-                    // Remove unnecessary keys
-                    $simpleAbandonedCart = $this->simpleMapping->getSimpleMapping('abandoned_cart', $cart);
+            $result = $result = Db::getInstance()->executeS($sql);
+            if (isset($result)) {
+                $lastId = $result[0]['id_cart'];
+            }
 
-                    // Assign entity_name attribute
-                    $simpleAbandonedCart['entity_name'] = 'abandonedcart';
+            $continue = true;
+            $i = 0;
+            // try to get 50 items if cart id
+            while ($this->collItems < self::LIMIT && $continue) {
 
-                    // Set to json
-                    $this->json[] = $simpleAbandonedCart;
+                foreach ($this->collection->carts as $cart) {
+                    // Get all carts that were NOT transformed into orders.
+                    if (!in_array($cart->id, $this->orderCartId)) {
+                        $this->collItems++;
+
+                        // Remove unnecessary keys
+                        $simpleAbandonedCart = $this->simpleMapping->getSimpleMapping('abandoned_cart', $cart);
+
+                        // Assign entity_name attribute
+                        $simpleAbandonedCart['entity_name'] = 'abandonedcart';
+
+                        // Set to json
+                        $this->json[] = $simpleAbandonedCart;
+                    }
                 }
+                $this->collection = $this->getCollection($cart->id, self::LIMIT - $this->collItems);
+                $continue = ($cart->id < $lastId?true:false);
             }
 
             // call encoder
-            $this->encodeJson();
-            // set entity name
-            $this->encodedJson['entity'] = 'abandonedcart';
+            $this->encodeJson('abandonedcart');
+            /** @var Cart $cart */
+            $this->encodedJson['lastId'] = ($cart ? $cart->id : 0);
 
             die(json_encode($this->encodedJson));
 

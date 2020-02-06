@@ -31,7 +31,7 @@ class ClarobiCreditMemoModuleFrontController extends ClarobiApiModuleFrontContro
         try {
             foreach ($this->collection->order_slips as $order_slip) {
                 // Remove unnecessary keys
-                $simpleOrderSlip= $this->simpleMapping->getSimpleMapping('order_slip', $order_slip);
+                $simpleOrderSlip = $this->simpleMapping->getSimpleMapping('order_slip', $order_slip);
 
                 // Assign entity_name attribute
                 $simpleOrderSlip['entity_name'] = 'sales_creditnote';
@@ -41,13 +41,13 @@ class ClarobiCreditMemoModuleFrontController extends ClarobiApiModuleFrontContro
             }
 
             // call encoder
-            $this->encodeJson();
-            // set entity name
-            $this->encodedJson['entity'] = 'sales_creditnote';
+            $this->encodeJson('sales_creditnote');
+            /** @var OrderSlip $order_slip */
+            $this->encodedJson['lastId'] = ($order_slip ? $order_slip->id : 0);
 
             die(json_encode($this->encodedJson));
 
-        }catch (Exception $exception){
+        } catch (Exception $exception) {
             $this->json = [
                 'status' => 'error',
                 'error' => $exception->getMessage()

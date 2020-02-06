@@ -12,7 +12,10 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
     protected $json = [];
     protected $encodedJson = [];
     protected $collection;
-    protected $params;
+    protected $params = [
+        'display' => 'full',
+        'output_format' => 'JSON'
+    ];
 
     /** @var ClaroMapping */
     protected $simpleMapping;
@@ -35,6 +38,11 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
         $this->shopDomain = Configuration::get('CLAROBI_WS_DOMAIN');
     }
 
+    /**
+     * Init PrestaShopWebservice library.
+     *
+     * @throws PrestaShopException
+     */
     public function init()
     {
         parent::init();
@@ -42,7 +50,7 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
         try {
             $this->webService = new PrestaShopWebservice($this->shopDomain, $this->webServiceKey, self::DEBUG);
         } catch (Exception $exception) {
-            ClaroLogger::errorLog(__METHOD__. ' : '. $exception->getMessage());
+            ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage());
             $this->json = [
                 'status' => 'error',
                 'error' => $exception->getMessage()
@@ -61,19 +69,13 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
 
         $from_id = Tools::getValue('from_id');
         $limit = Tools::getValue('limit');
-        $this->params = [
-            'display' => 'full',
-            'filter[id]' => '[' . $from_id . ',' . ($limit ? $limit + $from_id : self::LIMIT + $from_id) . ']',
-            'output_format' => 'JSON'
-        ];
 
         // Get the collection
         try {
-            $this->collection = json_decode($this->webService->get([
-                'url' => $this->utils->createUrlWithQuery($this->url, $this->params)
-            ]));
+            $this->collection = $this->getCollection($from_id, $limit);
+
         } catch (Exception $exception) {
-            ClaroLogger::errorLog(__METHOD__. ' : '. $exception->getMessage());
+            ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage());
 
             $this->json = [
                 'status' => 'error',
@@ -86,18 +88,38 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
     }
 
     /**
-     * Encode json.
-     * Must be called be each "dedicated" class after specific mapping.
+     * Set url params and get collection based on url.
+     *
+     * @param $from_id
+     * @param null $limit
+     * @return mixed
+     * @throws PrestaShopWebserviceException
      */
-    protected function encodeJson()
+    protected function getCollection($from_id, $limit = null)
+    {
+        $this->params['filter[id]'] = '[' . $from_id . ',' . ($limit ? $limit + $from_id : self::LIMIT + $from_id) . ']';
+
+        return json_decode($this->webService->get([
+            'url' => $this->utils->createUrlWithQuery($this->url, $this->params)
+        ]));
+    }
+
+    /**
+     * Format final json and encrypt data.
+     * Must be called by each derived class after specific mapping.
+     *
+     * @param string $entityName
+     * @param null $lastId
+     */
+    protected function encodeJson($entityName)
     {
         $this->encodedJson = [
             'isEncoded' => true,
             'isCompressed' => true,
             'data' => $this->utils->encode($this->json),
-            'license_key'=>Configuration::get('CLAROBI_LICENSE_KEY'),
-            'entity'=>'',
-            'type'=>'SYNC'
+            'license_key' => Configuration::get('CLAROBI_LICENSE_KEY'),
+            'entity' => $entityName,
+            'type' => 'SYNC'
         ];
     }
 }

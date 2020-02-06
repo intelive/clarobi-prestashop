@@ -44,7 +44,7 @@ class ClarobiCustomerModuleFrontController extends ClarobiApiModuleFrontControll
                 // Assign entity_name attribute
                 $simpleCustomer['entity_name'] = 'customer';
 
-                // Fields that need to be set
+                // Fields that are not available in collection
                 $simpleCustomer['group'] = $this->groups[$customer->id_default_group];
                 $customerObject = new Customer($customer->id);
                 $country = ($customerObject->getAddresses(1) ? $customerObject->getAddresses(1)[0]['country'] : null);
@@ -62,12 +62,13 @@ class ClarobiCustomerModuleFrontController extends ClarobiApiModuleFrontControll
                 $this->json[] = $simpleCustomer;
             }
 
-            // call parent encoder
-            parent::encodeJson();
-            // set entity name
-            $this->encodedJson['entity'] = 'customer';
+            // call encoder
+            $this->encodeJson('customer');
+            /** @var Customer $customer */
+            $this->encodedJson['lastId'] = ($customer ? $customer->id : 0);
 
             die(json_encode($this->encodedJson));
+
         } catch (Exception $exception) {
             $this->json = [
                 'status' => 'error',

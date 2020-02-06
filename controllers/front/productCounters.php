@@ -80,6 +80,12 @@ class ClarobiProductCountersModuleFrontController extends ClarobiApiModuleFrontC
                 }
                 $this->json['counters'] = $this->counters;
             }
+
+            // call encoder
+            $this->encodeJson('productCounters');
+
+            die(json_encode($this->encodedJson));
+
         } catch (PrestaShopDatabaseException $e) {
             ClaroLogger::errorLog( __METHOD__. ' : DBException: ' . $e->getMessage());
 
@@ -87,14 +93,7 @@ class ClarobiProductCountersModuleFrontController extends ClarobiApiModuleFrontC
                 'status' => 'error',
                 'message' => $e->getMessage()
             ];
-            die(json_encode($this->encodedJson));
+            die(json_encode($this->json));
         }
-
-        // call parent encoder
-        parent::encodeJson();
-        // set entity name
-        $this->encodedJson['entity'] = 'productCounters';
-
-        die(json_encode($this->encodedJson));
     }
 }

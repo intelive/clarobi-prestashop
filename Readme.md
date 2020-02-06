@@ -25,6 +25,7 @@ This module is available for PrestaShop versions: 1.6.x - 1.7.x
 
 ## Installation
 
+### Install from PrestaShop
 To install module on PrestaShop, download zip package form [product page on PrestaShop Addons][addons].
 
 Once the download is complete follow the steps:
@@ -35,6 +36,9 @@ Once the download is complete follow the steps:
     * Scroll down if necessary
     * Refresh the BackOffice if necessary
 * Click >> Configure to finish the setup
+
+### Install from GitHub
+
 
 ## Configuration
 
@@ -71,6 +75,6 @@ To uninstall ClaroBi module you need to:
 
 [clarobi]: https://clarobi.com/
 [clarobi-login]: https://app.clarobi.com/login
-[clarobi-repo]:  https://link.to.repo
+[clarobi-repo]:  https://github.com/intelive/clarobi-prestashop
 [addons]: https://addons.prestashop.com/en/link/to/clarobi/in/market/place
 

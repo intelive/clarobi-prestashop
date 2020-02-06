@@ -40,12 +40,13 @@ class ClarobiProductModuleFrontController extends ClarobiApiModuleFrontControlle
                 $this->json[] = $simpleProduct;
             }
 
-            // call parent encoder
-            parent::encodeJson();
-            // set entity name
-            $this->encodedJson['entity'] = 'product';
+            // call encoder
+            $this->encodeJson('product');
+            /** @var Product $product */
+            $this->encodedJson['lastId'] = ($product ? $product->id : 0);
 
             die(json_encode($this->encodedJson));
+
         } catch (Exception $exception) {
             $this->json = [
                 'status' => 'error',

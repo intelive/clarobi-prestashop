@@ -41,12 +41,13 @@ class ClarobiInvoiceModuleFrontController extends ClarobiApiModuleFrontControlle
                 $this->json[] = $simpleInvoice;
             }
 
-            // call parent encoder
-            parent::encodeJson();
-            // set entity name
-            $this->encodedJson['entity'] = 'sales_invoice';
+            // call encoder
+            $this->encodeJson('sales_invoice');
+            /** @var OrderInvoice $invoice */
+            $this->encodedJson['lastId'] = ($invoice ? $invoice->id : 0);
 
             die(json_encode($this->encodedJson));
+
         } catch (Exception $exception) {
             $this->json = [
                 'status' => 'error',

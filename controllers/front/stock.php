@@ -42,12 +42,13 @@ class ClarobiStockModuleFrontController extends ClarobiApiModuleFrontController
                 $this->json['stock'][] = $simpleStockAvailable;
             }
 
-            // call parent encoder
-            parent::encodeJson();
-            // set entity name
-            $this->encodedJson['entity'] = 'stocks';
+            // call encoder
+            $this->encodeJson('stocks');
+            /** @var StockAvailable $stock_available */
+            $this->encodedJson['lastId'] = ($stock_available ? $stock_available->id : 0);
 
             die(json_encode($this->encodedJson));
+
         } catch (Exception $exception) {
             $this->json = [
                 'status' => 'error',

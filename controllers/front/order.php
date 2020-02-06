@@ -42,12 +42,13 @@ class ClarobiOrderModuleFrontController extends ClarobiApiModuleFrontController
                 $this->json[] = $simpleOrder;
             }
 
-            // call parent encoder
-            parent::encodeJson();
-            // set entity name
-            $this->encodedJson['entity'] = 'order';
+            // call encoder
+            $this->encodeJson('order');
+            /** @var Order $order */
+            $this->encodedJson['lastId'] = ($order ? $order->id : 0);
 
             die(json_encode($this->encodedJson));
+
         } catch (Exception $exception) {
             $this->json = [
                 'status' => 'error',
