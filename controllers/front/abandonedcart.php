@@ -2,7 +2,7 @@
 
 include(_PS_MODULE_DIR_ . 'clarobi/controllers/front/api/api.php');
 
-class ClarobiAbandonedCartModuleFrontController extends ClarobiApiModuleFrontController
+class ClarobiAbandonedcartModuleFrontController extends ClarobiApiModuleFrontController
 {
     protected $orders;
     protected $orderCartId;
@@ -76,12 +76,28 @@ class ClarobiAbandonedCartModuleFrontController extends ClarobiApiModuleFrontCon
                         // Assign entity_name attribute
                         $simpleAbandonedCart['entity_name'] = 'abandonedcart';
 
+                        $items = [];
+                        if (isset($cart->associations)) {
+                            foreach ($cart->associations->cart_rows as $cart_row) {
+                                /** @var Product $product */
+                                $product = new Product($cart_row->id_product);
+                                $cart_row->product_name = $product->name[1];
+                                $cart_row->product_price = $product->price;
+                                $cart_row->product_reference = $product->reference;
+
+                                $items[] = $cart_row;
+                            }
+                            $simpleAbandonedCart['associations']->cart_rows = $items;
+                        } else {
+                            $simpleAbandonedCart['associations'] = ['cart_rows' => []];
+                        }
+
                         // Set to json
                         $this->json[] = $simpleAbandonedCart;
                     }
                 }
                 $this->collection = $this->getCollection($cart->id, self::LIMIT - $this->collItems);
-                $continue = ($cart->id < $lastId?true:false);
+                $continue = ($cart->id < $lastId ? true : false);
             }
 
             // call encoder

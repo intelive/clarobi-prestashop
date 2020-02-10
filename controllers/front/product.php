@@ -36,6 +36,25 @@ class ClarobiProductModuleFrontController extends ClarobiApiModuleFrontControlle
                 // Assign entity_name attribute
                 $simpleProduct['entity_name'] = 'product';
 
+                $options = [];
+                if (isset($product->associations->combinations)) {
+                    $object = new Product($product->id);
+                    foreach ($object->getAttributeCombinations() as $attributeCombination) {
+                        $options[] = [
+                            'id_product_attribute' => $attributeCombination['id_product_attribute'],
+                            'id_product' => $attributeCombination['id_product'],
+                            'price' => $attributeCombination['price'],
+                            'id_shop' => $attributeCombination['id_shop'],
+                            'id_attribute_group' => $attributeCombination['id_attribute_group'],
+                            'group_name' => $attributeCombination['group_name'],
+                            'attribute_name' => $attributeCombination['attribute_name'],
+                            'id_attribute' => $attributeCombination['id_attribute'],
+                        ];
+                    }
+                    $this->getCategoryPath($object->getCategories());
+                }
+                $simpleProduct['options'] = $options;
+
                 // Set to json
                 $this->json[] = $simpleProduct;
             }
@@ -48,6 +67,8 @@ class ClarobiProductModuleFrontController extends ClarobiApiModuleFrontControlle
             die(json_encode($this->encodedJson));
 
         } catch (Exception $exception) {
+            ClaroLogger::errorLog(__CLASS__.':'. __METHOD__ . ' : ' . $exception->getMessage());
+
             $this->json = [
                 'status' => 'error',
                 'error' => $exception->getMessage()

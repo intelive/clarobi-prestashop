@@ -4,7 +4,6 @@ include(_PS_MODULE_DIR_ . 'clarobi/controllers/front/api/api.php');
 
 class ClarobiCustomerModuleFrontController extends ClarobiApiModuleFrontController
 {
-    protected $groups;
 
     /**
      * ClarobiCustomerModuleFrontController constructor.
@@ -21,11 +20,6 @@ class ClarobiCustomerModuleFrontController extends ClarobiApiModuleFrontControll
     public function init()
     {
         parent::init();
-
-        $groups = Group::getGroups(1);
-        foreach ($groups as $group) {
-            $this->groups[$group['id_group']] = $group['name'];
-        }
     }
 
     /**
@@ -36,7 +30,6 @@ class ClarobiCustomerModuleFrontController extends ClarobiApiModuleFrontControll
         parent::initContent();
 
         try {
-
             foreach ($this->collection->customers as $customer) {
                 // Remove unnecessary keys
                 $simpleCustomer = $this->simpleMapping->getSimpleMapping('customer', $customer);
@@ -70,6 +63,8 @@ class ClarobiCustomerModuleFrontController extends ClarobiApiModuleFrontControll
             die(json_encode($this->encodedJson));
 
         } catch (Exception $exception) {
+            ClaroLogger::errorLog(__CLASS__.':'. __METHOD__ . ' : ' . $exception->getMessage());
+
             $this->json = [
                 'status' => 'error',
                 'error' => $exception->getMessage()

@@ -37,6 +37,21 @@ class ClarobiInvoiceModuleFrontController extends ClarobiApiModuleFrontControlle
                 // Assign entity_name attribute
                 $simpleInvoice['entity_name'] = 'sales_invoice';
 
+                /** @var OrderInvoice $object */
+                $object = new OrderInvoice($invoice->id);
+
+                $items =[];
+                foreach($object->getProducts() as $product){
+                    $items[] = [
+                        'product_id'=>$product['product_id'],
+                        'product_quantity'=>$product['product_quantity'],
+                        'product_price' =>$product['product_price']
+                    ];
+                }
+                $simpleInvoice['id_shop'] = $product['id_shop'];
+                $simpleInvoice['currency_code'] = $this->getCurrencyISOFromId($object->getOrder()->id_currency);
+                $simpleInvoice['items'] = $items;
+
                 // Set to json
                 $this->json[] = $simpleInvoice;
             }

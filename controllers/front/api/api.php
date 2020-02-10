@@ -29,6 +29,8 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
     /** @var ClaroHelper */
     public $utils;
 
+    protected $groups;
+
     public function __construct()
     {
         parent::__construct();
@@ -36,6 +38,11 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
         $this->utils = new ClaroHelper();
         $this->webServiceKey = Configuration::get('CLAROBI_WS_KEY');
         $this->shopDomain = Configuration::get('CLAROBI_WS_DOMAIN');
+
+        $groups = Group::getGroups(1);
+        foreach ($groups as $group) {
+            $this->groups[$group['id_group']] = $group['name'];
+        }
     }
 
     /**
@@ -50,7 +57,8 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
         try {
             $this->webService = new PrestaShopWebservice($this->shopDomain, $this->webServiceKey, self::DEBUG);
         } catch (Exception $exception) {
-            ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage());
+            ClaroLogger::errorLog(__CLASS__ . ':' . __METHOD__ . ' : ' . $exception->getMessage());
+
             $this->json = [
                 'status' => 'error',
                 'error' => $exception->getMessage()
@@ -75,7 +83,7 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
             $this->collection = $this->getCollection($from_id, $limit);
 
         } catch (Exception $exception) {
-            ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage());
+            ClaroLogger::errorLog(__CLASS__ . ':' . __METHOD__ . ' : ' . $exception->getMessage());
 
             $this->json = [
                 'status' => 'error',
@@ -85,23 +93,6 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
         }
 
         // Output collection in derived class
-    }
-
-    /**
-     * Set url params and get collection based on url.
-     *
-     * @param $from_id
-     * @param null $limit
-     * @return mixed
-     * @throws PrestaShopWebserviceException
-     */
-    protected function getCollection($from_id, $limit = null)
-    {
-        $this->params['filter[id]'] = '[' . $from_id . ',' . ($limit ? $limit + $from_id : self::LIMIT + $from_id) . ']';
-
-        return json_decode($this->webService->get([
-            'url' => $this->utils->createUrlWithQuery($this->url, $this->params)
-        ]));
     }
 
     /**
@@ -121,5 +112,115 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
             'entity' => $entityName,
             'type' => 'SYNC'
         ];
+    }
+
+    /**
+     * Set url params and get collection based on url.
+     *
+     * @param $from_id
+     * @param null $limit
+     * @return mixed
+     * @throws Exception
+     */
+    protected function getCollection($from_id, $limit = null)
+    {
+        $this->params['filter[id]'] = '[' . $from_id . ',' . ($limit ? $limit + $from_id : self::LIMIT + $from_id) . ']';
+
+        return json_decode($this->webService->get([
+            'url' => $this->utils->createUrlWithQuery($this->url, $this->params)
+        ]));
+    }
+
+    /**
+     * Get state abbreviation based on id.
+     *
+     * @param $id_state
+     * @return string
+     */
+    protected function getStateISOFromId($id_state)
+    {
+        /** @var State $state */
+        try {
+            $state = new State($id_state);
+        } catch (Exception $exception) {
+            ClaroLogger::errorLog(__CLASS__ . ':' . __METHOD__ . ' : ' . $exception->getMessage());
+
+            return null;
+        }
+        return $state->iso_code;
+    }
+
+    /**
+     * Get address based on id.
+     *
+     * @param $id_address
+     * @return array
+     */
+    protected function getAddress($id_address)
+    {
+        /** @var Address $address */
+        $address = new Address($id_address);
+        $state_code = $this->getStateISOFromId($address->id_state); //iso
+        return [
+            'postal_code' => $address->postcode,
+            'city' => $address->city,
+            'state_code' => $state_code,
+            'country' => $address->country
+        ];
+    }
+
+    /**
+     * Get specific fields from customer based on id.
+     * Needed for order mapping.
+     *
+     * @param int $id_customer
+     * @return array
+     */
+    protected function getSimpleCustomer($id_customer)
+    {
+        $customer = new Customer((int)$id_customer);
+        return [
+            'id' => $customer->id,
+            'name' => $customer->firstname . ' ' . $customer->lastname,
+            'email' => $customer->email,
+            'group' => $this->groups[$customer->id_default_group]
+        ];
+    }
+
+    /**
+     * Get category tree of one product.
+     *
+     * @param int $id_product
+     * @return array
+     */
+    protected function getCategoryPathTree($id_product)
+    {
+        try {
+            $product = new Product((int)$id_product);
+            $categories = $product->getParentCategories();
+            $categoriesArray = [];
+            foreach ($categories as $category) {
+                $categoriesArray[] = [
+                    'id' => $category['id_category'],
+                    'name' => $category['name']
+                ];
+            }
+            return $categoriesArray;
+        } catch (Exception $exception) {
+            ClaroLogger::errorLog(__CLASS__ . ':' . __METHOD__ . ' : ' . $exception->getMessage());
+
+            return [];
+        }
+    }
+
+    /**
+     * Get currency code based on id.
+     *
+     * @param int $id_currency
+     * @return string
+     */
+    protected function getCurrencyISOFromId($id_currency){
+        $currency = new Currency((int)$id_currency);
+        return $currency->iso_code;
     }
 }
