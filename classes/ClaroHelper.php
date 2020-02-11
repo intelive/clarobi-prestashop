@@ -57,6 +57,29 @@ class ClaroHelper
     }
 
     /**
+     * Compress encoded data if lib and functions exist.
+     *
+     * @param $data
+     * @return string
+     */
+    public function compress($data)
+    {
+        if (
+            extension_loaded('zlib') &&
+            function_exists('gzcompress') &&
+            function_exists('base64_encode')
+        ) {
+            return base64_encode(gzcompress(serialize(($data))));
+        } else {
+            ClaroLogger::errorLog(__METHOD__ . ' : ' . 'Extensions zlib or gzcompress or base64_encode do not exist');
+        }
+
+        return false;
+    }
+
+    /**
+     * Encode data with API_SECRET from configuration.
+     *
      * @param $payload
      * @return string
      */
@@ -69,6 +92,8 @@ class ClaroHelper
     }
 
     /**
+     * Decode data with API_SECRET from configuration.
+     *
      * @param $payload
      * @return string
      */
