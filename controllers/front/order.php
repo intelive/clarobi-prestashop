@@ -10,6 +10,7 @@ class ClarobiOrderModuleFrontController extends ClarobiApiModuleFrontController
     public function __construct()
     {
         parent::__construct();
+        // Set entity in url
         $this->url = $this->shopDomain . '/api/orders';
     }
 
@@ -29,7 +30,6 @@ class ClarobiOrderModuleFrontController extends ClarobiApiModuleFrontController
         parent::initContent();
 
         try {
-            $i = 0;
             foreach ($this->collection->orders as $order) {
                 // Remove unnecessary keys
                 $simpleOrder = $this->simpleMapping->getSimpleMapping('order', $order);
@@ -50,16 +50,7 @@ class ClarobiOrderModuleFrontController extends ClarobiApiModuleFrontController
                 $simpleOrder['delivery_address'] = $this->getAddress($order->id_address_delivery);
                 $simpleOrder['invoice_address'] = $this->getAddress($order->id_address_invoice);
 
-                $items = [];
-                foreach ($order->associations->order_rows as $order_row) {
-                    $order_row->categories = $this->getCategoryPathTree($order_row->product_id);
-                    $product = new Product($order_row->product_id);
-                    $order_row->product_type = (!empty($product->getAttributeCombinations()) ? 'configurable' : $product->getWsType());
-
-                    $items[] = $order_row;
-                }
-
-                $simpleOrder['associations']->order_rows = $items;
+                $simpleOrder['associations']->order_rows = $this->associationsOrderRowsMapping($order);
 
                 // todo delete this fields since you can get google analytics only if set it up
                 $simpleOrder['source'] = '(untracked)';
@@ -73,14 +64,14 @@ class ClarobiOrderModuleFrontController extends ClarobiApiModuleFrontController
             }
 
             // call encoder
-            $this->encodeJson('order');
+            $this->encodeJson('sales_order');
             /** @var Order $order */
             $this->encodedJson['lastId'] = ($order ? $order->id : 0);
 
             die(json_encode($this->encodedJson));
 
         } catch (Exception $exception) {
-            ClaroLogger::errorLog(__CLASS__ . ':' . __METHOD__ . ' : ' . $exception->getMessage());
+            ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
             $this->json = [
                 'status' => 'error',
@@ -88,5 +79,25 @@ class ClarobiOrderModuleFrontController extends ClarobiApiModuleFrontController
             ];
             die(json_encode($this->json));
         }
+    }
+
+    /**
+     * Map order products.
+     *
+     * @param $order
+     * @return array
+     * @throws Exception
+     */
+    private function associationsOrderRowsMapping($order){
+        $items = [];
+        foreach ($order->associations->order_rows as $order_row) {
+            $order_row->categories = $this->getCategoryPathTree($order_row->product_id);
+            /** @var Product $product */
+            $product = new Product($order_row->product_id);
+            $order_row->product_type = (!empty($product->getAttributeCombinations()) ? 'configurable' : $product->getWsType());
+
+            $items[] = $order_row;
+        }
+        return $items;
     }
 }

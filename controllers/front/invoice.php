@@ -10,6 +10,7 @@ class ClarobiInvoiceModuleFrontController extends ClarobiApiModuleFrontControlle
     public function __construct()
     {
         parent::__construct();
+        // Set entity in url
         $this->url = $this->shopDomain . '/api/order_invoices';
     }
 
@@ -29,7 +30,6 @@ class ClarobiInvoiceModuleFrontController extends ClarobiApiModuleFrontControlle
         parent::initContent();
 
         try {
-
             foreach ($this->collection->order_invoices as $invoice) {
                 // Remove unnecessary keys
                 $simpleInvoice = $this->simpleMapping->getSimpleMapping('order_invoice', $invoice);
@@ -37,20 +37,14 @@ class ClarobiInvoiceModuleFrontController extends ClarobiApiModuleFrontControlle
                 // Assign entity_name attribute
                 $simpleInvoice['entity_name'] = 'sales_invoice';
 
-                /** @var OrderInvoice $object */
-                $object = new OrderInvoice($invoice->id);
+                /** @var OrderInvoice $invoiceObject */
+                $invoiceObject = new OrderInvoice($invoice->id);
 
-                $items =[];
-                foreach($object->getProducts() as $product){
-                    $items[] = [
-                        'product_id'=>$product['product_id'],
-                        'product_quantity'=>$product['product_quantity'],
-                        'product_price' =>$product['product_price']
-                    ];
-                }
-                $simpleInvoice['id_shop'] = $product['id_shop'];
-                $simpleInvoice['currency_code'] = $this->getCurrencyISOFromId($object->getOrder()->id_currency);
-                $simpleInvoice['items'] = $items;
+                $result = $this->invoiceProductsMapping($invoiceObject);
+
+                $simpleInvoice['id_shop'] = $result['id_shop'];
+                $simpleInvoice['items'] = $result['items'];
+                $simpleInvoice['currency_code'] = $this->getCurrencyISOFromId($invoiceObject->getOrder()->id_currency);
 
                 // Set to json
                 $this->json[] = $simpleInvoice;
@@ -64,11 +58,34 @@ class ClarobiInvoiceModuleFrontController extends ClarobiApiModuleFrontControlle
             die(json_encode($this->encodedJson));
 
         } catch (Exception $exception) {
+            ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine() . ' at line ' . $exception->getLine());
+
             $this->json = [
                 'status' => 'error',
                 'error' => $exception->getMessage()
             ];
             die(json_encode($this->json));
         }
+    }
+
+    /**
+     * Map invoice products.
+     *
+     * @param OrderInvoice $invoice
+     * @return array
+     */
+    private function invoiceProductsMapping($invoice)
+    {
+        $items = [];
+        /** @var array $product */
+        foreach ($invoice->getProducts() as $product) {
+            $items[] = [
+                'product_id' => $product['product_id'],
+                'product_quantity' => $product['product_quantity'],
+                'product_price' => $product['product_price']
+            ];
+        }
+
+        return ['items' => $items, 'id_shop' =>  $product['id_shop']];
     }
 }
