@@ -48,16 +48,16 @@ abstract class ClarobiApiAuthModuleFrontController extends ModuleFrontController
         $authToken = (isset($_SERVER['HTTP_X_CLARO_TOKEN']) ? $_SERVER['HTTP_X_CLARO_TOKEN'] : []);
 
         if (empty($authToken)) {
-            ClaroLogger::errorLog(__CLASS__.':'. __METHOD__. ' : Missing token from request');
+            ClaroLogger::errorLog(__METHOD__ . ' : Missing token from request.');
             return false;
         }
-        if(empty($token)){
-            ClaroLogger::errorLog(__CLASS__.':'. __METHOD__. ' : API_KEY (token) not found in database (configuration)');
+        if (empty($token)) {
+            ClaroLogger::errorLog(__METHOD__ . ' : API_KEY (token) not found in database (configuration).');
             return false;
         }
         if (trim($token) != trim($authToken)) {
-            ClaroLogger::errorLog(__CLASS__.':'. __METHOD__. " : Claro feed request with invalid security token: " . $authToken .
-             " compared to stored token: " . $token);
+            ClaroLogger::errorLog(__METHOD__ . " : Claro feed request with invalid security token: " . $authToken .
+                " compared to stored token: " . $token);
             return false;
         }
         return true;
