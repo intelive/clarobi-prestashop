@@ -12,23 +12,27 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
     protected $json = [];
     protected $encodedJson = [];
     protected $collection;
+    protected $collItems;
+    protected $lastId;
+
     protected $params = [
         'display' => 'full',
-        'output_format' => 'JSON'
+        'output_format' => 'JSON',
+        'sort' => 'id_ASC'    // return last id = fromId otherwise
     ];
 
     /** @var ClaroMapping */
     protected $simpleMapping;
-
     /** @var PrestaShopWebservice webService */
     protected $webService;
+    /** @var ClaroHelper */
+    public $utils;
+
     protected $webServiceKey;
     protected $shopDomain;
     protected $url;
 
-    /** @var ClaroHelper */
-    public $utils;
-
+    // Customers groups as id => name array
     protected $groups;
 
     public function __construct()
@@ -57,7 +61,7 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
         try {
             $this->webService = new PrestaShopWebservice($this->shopDomain, $this->webServiceKey, self::DEBUG);
         } catch (Exception $exception) {
-            ClaroLogger::errorLog(__CLASS__ . ':' . __METHOD__ . ' : ' . $exception->getMessage());
+            ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
             $this->json = [
                 'status' => 'error',
@@ -75,15 +79,19 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
     {
         parent::initContent();
 
-        $from_id = Tools::getValue('from_id');
-        $limit = Tools::getValue('limit');
-
         // Get the collection
         try {
-            $this->collection = $this->getCollection($from_id, $limit);
+            if (Tools::getIsset('from_id')) {
+                $from_id = Tools::getValue('from_id');
+            } else {
+                throw new Exception('Parameter \'from_id\' not found!');
+            }
+
+            // todo make collection to return 50 items not filter[id]=[fromId, fromId+50] - incorrect
+            $this->collection = $this->getCollection($from_id, null);
 
         } catch (Exception $exception) {
-            ClaroLogger::errorLog(__CLASS__ . ':' . __METHOD__ . ' : ' . $exception->getMessage());
+            ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
             $this->json = [
                 'status' => 'error',
@@ -104,10 +112,29 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
      */
     protected function encodeJson($entityName)
     {
+        $data = $this->json;
+        $responseIsEncoded = $responseIsCompressed = false;
+
+        // Encode and compress the data only if we have it
+        if (!empty($data)) {
+            $encoded = $this->utils->encode($data);
+
+            if (is_string($encoded)) {
+                $responseIsEncoded = true;
+                $data = $encoded;
+            }
+
+            $compressed = $this->utils->compress($encoded);
+            if ($compressed) {
+                $responseIsCompressed = true;
+                $data = $compressed;
+            }
+        }
+
         $this->encodedJson = [
-            'isEncoded' => true,
-            'isCompressed' => true,
-            'data' => $this->utils->encode($this->json),
+            'isEncoded' => $responseIsEncoded,
+            'isCompressed' => $responseIsCompressed,
+            'data' => $data,
             'license_key' => Configuration::get('CLAROBI_LICENSE_KEY'),
             'entity' => $entityName,
             'type' => 'SYNC'
@@ -125,6 +152,7 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
     protected function getCollection($from_id, $limit = null)
     {
         $this->params['filter[id]'] = '[' . $from_id . ',' . ($limit ? $limit + $from_id : self::LIMIT + $from_id) . ']';
+//        $this->params['limit'] = ($from_id == 0 ? $from_id : $from_id - 1) . ',' . ($limit ? $limit : self::LIMIT);
 
         return json_decode($this->webService->get([
             'url' => $this->utils->createUrlWithQuery($this->url, $this->params)
@@ -143,7 +171,7 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
         try {
             $state = new State($id_state);
         } catch (Exception $exception) {
-            ClaroLogger::errorLog(__CLASS__ . ':' . __METHOD__ . ' : ' . $exception->getMessage());
+            ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
             return null;
         }
@@ -207,7 +235,7 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
             }
             return $categoriesArray;
         } catch (Exception $exception) {
-            ClaroLogger::errorLog(__CLASS__ . ':' . __METHOD__ . ' : ' . $exception->getMessage());
+            ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
             return [];
         }
@@ -219,7 +247,8 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
      * @param int $id_currency
      * @return string
      */
-    protected function getCurrencyISOFromId($id_currency){
+    protected function getCurrencyISOFromId($id_currency)
+    {
         $currency = new Currency((int)$id_currency);
         return $currency->iso_code;
     }
