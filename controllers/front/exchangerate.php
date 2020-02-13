@@ -1,6 +1,6 @@
 <?php
 
-include(_PS_MODULE_DIR_ . 'clarobi/controllers/front/api/api.php');
+include('api/api.php');
 
 class ClarobiExchangerateModuleFrontController extends ClarobiApiModuleFrontController
 {
@@ -41,10 +41,8 @@ class ClarobiExchangerateModuleFrontController extends ClarobiApiModuleFrontCont
                 ];
             }
 
-            // todo stock and exchange rate will be compressed and encoded ?
-
             // call encoder
-            $this->encodeJson('exchangerate');
+            $this->encodeJson('exchange_rate','EXCHANGE_RATE');
 
             die(json_encode($this->encodedJson));
 
