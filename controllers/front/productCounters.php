@@ -1,7 +1,31 @@
 <?php
+/**
+ * 2007-2020 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ * @author    PrestaShop SA <contact@prestashop.com>
+ * @copyright 2007-2020 PrestaShop SA
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  International Registered Trademark & Property of PrestaShop SA
+ */
 
-include _PS_ROOT_DIR_ . '/modules/statsproduct/statsproduct.php';
-include(_PS_MODULE_DIR_ . 'clarobi/controllers/front/api/api.php');
+include(_PS_ROOT_DIR_ . '/modules/statsproduct/statsproduct.php');
+include('api/api.php');
 
 class ClarobiProductCountersModuleFrontController extends ClarobiApiModuleFrontController
 {
@@ -42,6 +66,8 @@ class ClarobiProductCountersModuleFrontController extends ClarobiApiModuleFrontC
                 }
             }
         } catch (PrestaShopDatabaseException $exception) {
+            ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
+
             $this->json = [
                 'status' => 'error',
                 'error' => $exception->getMessage()
@@ -62,7 +88,12 @@ class ClarobiProductCountersModuleFrontController extends ClarobiApiModuleFrontC
          */
 
         try {
-            $sql = 'SELECT * FROM `'._DB_PREFIX_.'clarobi_products`';
+            $this->json = [
+                'date' => date('Y-m-d H:i:s', time()),
+                'counters' => []
+            ];
+
+            $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'clarobi_products`';
             $result = Db::getInstance()->executeS($sql);
             // get result from clarobi_products table
             if (isset($result)) {
@@ -82,16 +113,17 @@ class ClarobiProductCountersModuleFrontController extends ClarobiApiModuleFrontC
             }
 
             // call encoder
-            $this->encodeJson('productCounters');
+            $this->encodeJson('product_counter', 'PRODUCT_COUNTERS');
 
             die(json_encode($this->encodedJson));
 
-        } catch (PrestaShopDatabaseException $e) {
-            ClaroLogger::errorLog( __METHOD__. ' : DBException: ' . $e->getMessage());
+        } catch (PrestaShopDatabaseException $exception) {
+            ClaroLogger::errorLog(__METHOD__ . ' : DBException: ' . $exception->getMessage()
+                . ' at line ' . $exception->getLine());
 
             $this->json = [
                 'status' => 'error',
-                'message' => $e->getMessage()
+                'message' => $exception->getMessage()
             ];
             die(json_encode($this->json));
         }

@@ -1,12 +1,39 @@
 <?php
+/**
+ * 2007-2020 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ * @author    PrestaShop SA <contact@prestashop.com>
+ * @copyright 2007-2020 PrestaShop SA
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  International Registered Trademark & Property of PrestaShop SA
+ */
 
 class ClaroHelper
 {
+    protected $secret;
+
     /**
      * ClaroHelper constructor.
      */
     public function __construct()
     {
+        $this->secret = Configuration::get('CLAROBI_API_SECRET');
     }
 
     /**
@@ -35,7 +62,7 @@ class ClaroHelper
         $string = '';
 
         for ($i = 0; $i < $length; $i++) {
-            $string .= $characters[mt_rand(0, strlen($characters) - 1)];
+            $string .= $characters[mt_rand(0, Tools::strlen($characters) - 1)];
         }
 
         return $string;
@@ -52,7 +79,8 @@ class ClaroHelper
         foreach ($params as $param => $value) {
             $query .= $param . '=' . $value . '&';
         }
-        $url .= substr($query, 0, -1);
+        $url .= Tools::substr($query, 0, -1);
+
         return $url;
     }
 
@@ -64,11 +92,11 @@ class ClaroHelper
      */
     public function compress($data)
     {
-        if (
-            extension_loaded('zlib') &&
+        if (extension_loaded('zlib') &&
             function_exists('gzcompress') &&
             function_exists('base64_encode')
         ) {
+//            return gzcompress(serialize(($data)));
             return base64_encode(gzcompress(serialize(($data))));
         } else {
             ClaroLogger::errorLog(__METHOD__ . ' : ' . 'Extensions zlib or gzcompress or base64_encode do not exist');
@@ -86,8 +114,9 @@ class ClaroHelper
     public function encode($payload)
     {
         $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
-        $encrypted = openssl_encrypt(json_encode($payload), 'aes-256-cbc',Configuration::get('CLAROBI_API_SECRET'), 0, $iv);
+        $encrypted = openssl_encrypt(json_encode($payload), 'aes-256-cbc', $this->secret, 0, $iv);
 
+//        return ($encrypted . '::' . $iv);
         return base64_encode($encrypted . '::' . $iv);
     }
 
@@ -99,7 +128,9 @@ class ClaroHelper
      */
     public function decode($payload)
     {
-        list($encryptedData, $iv) = explode('::', base64_decode($payload), 2);
-        return json_decode(openssl_decrypt($encryptedData, 'aes-256-cbc', Configuration::get('CLAROBI_API_SECRET'), 0, $iv));
+//        list($encryptedData, $iv) = explode('::', base64_decode($payload), 2);
+        list($encryptedData, $iv) = explode('::', $payload, 2);
+
+        return json_decode(openssl_decrypt($encryptedData, 'aes-256-cbc', $this->secret, 0, $iv));
     }
 }

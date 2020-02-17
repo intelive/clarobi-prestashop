@@ -31,21 +31,18 @@ if (!defined('_PS_VERSION_')) {
 include(dirname(__FILE__) . '/classes/ClaroConfig.php');
 include(dirname(__FILE__) . '/classes/ClaroWebService.php');
 
-use Analog\Handler\ChromeLogger;
-use Analog\Analog;
-
 class Clarobi extends Module
 {
     private $html = '';
+
     public function __construct()
     {
-        Analog::handler(ChromeLogger::init());
-
-        $this->name = 'claroBi';
+        $this->name = 'clarobi';
         $this->tab = 'administration';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'Interlive Metrics';
         $this->need_instance = 1;
+        $this->module_key = 'c55ed1148592523f3abc22e1b064993c';
 
         /**
          * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
@@ -55,7 +52,8 @@ class Clarobi extends Module
         parent::__construct();
 
         $this->displayName = $this->l('ClaroBi');
-        $this->description = $this->l('API to provide the necessary statistics for ClaroBi analytics that are not made available by PrestaShop');
+        $this->description = $this->l('API to provide the necessary statistics for ClaroBi 
+                                                analytics that are not made available by PrestaShop');
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall ClaroBi analytics and statistics?');
 
@@ -253,12 +251,12 @@ class Clarobi extends Module
     private function getProducts()
     {
         $sql = 'SELECT *
-				FROM `'._DB_PREFIX_.'clarobi_products` cp';
+				FROM `' . _DB_PREFIX_ . 'clarobi_products` cp';
 
         try {
             return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
-        } catch (PrestaShopDatabaseException $e) {
-            ClaroLogger::errorLog(__METHOD__.' : '.$e->getMessage());
+        } catch (PrestaShopDatabaseException $exception) {
+            ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
         }
 
         return [];
@@ -272,12 +270,16 @@ class Clarobi extends Module
     {
         $this->html = '
 			<div class="panel-heading">
-				'.$this->displayName.'
+				' . $this->displayName . '
 			</div>
-			<h4>'.$this->trans('Guide', array(), 'Admin.Global').'</h4>
+			<h4>' . $this->trans('Guide', array(), 'Admin.Global') . '</h4>
 			<div class="alert alert-info">
 				<h4>Number of adds to cart compared to number of views</h4>
-				<p class="font-italic">'.$this->trans('This are the calculated numbers since module installation.', array(), 'Modules.Clarobi.Admin').'</p>
+				<p class="font-italic">'
+            . $this->trans('This are the calculated numbers since module installation.',
+                array(),
+                'Modules.Clarobi.Admin')
+            . '</p>
 			</div>';
         $this->html .= '
 			<h4>ClaroBi calculated data</h4>
@@ -285,19 +287,19 @@ class Clarobi extends Module
 				<thead>
 					<tr>
 						<th>
-							<span class="title_box  active">'.$this->trans('Product id', array(), 'Admin.Global').'</span>
+							<span class="title_box  active">' . $this->trans('Product id', array(), 'Admin.Global') . '</span>
 						</th>
 						<th>
-							<span class="title_box  active">'.$this->trans('Total adds to cart', array(), 'Admin.Global').'</span>
+							<span class="title_box  active">' . $this->trans('Total adds to cart', array(), 'Admin.Global') . '</span>
 						</th>
 						<th>
-							<span class="title_box  active">'.$this->trans('Total views', array(), 'Admin.Global').'</span>
+							<span class="title_box  active">' . $this->trans('Total views', array(), 'Admin.Global') . '</span>
 						</th>
 						<th>
-							<span class="title_box  active">'.$this->trans('Date add', array(), 'Admin.Global').'</span>
+							<span class="title_box  active">' . $this->trans('Date add', array(), 'Admin.Global') . '</span>
 						</th>
 						<th>
-							<span class="title_box  active">'.$this->trans('Date update', array(), 'Admin.Global').'</span>
+							<span class="title_box  active">' . $this->trans('Date update', array(), 'Admin.Global') . '</span>
 						</th>
 					</tr>
 				</thead>
@@ -306,11 +308,11 @@ class Clarobi extends Module
         foreach ($this->getProducts() as $product) {
             $this->html .= '
 				<tr>
-					<td>'.$product['id_product'].'</td>
-					<td>'.$product['add_to_cart'].'</td>
-					<td>'.$product['views'].'</td>
-					<td>'.$product['date_add'].'</td>
-					<td>'.$product['date_update'].'</td>
+					<td>' . $product['id_product'] . '</td>
+					<td>' . $product['add_to_cart'] . '</td>
+					<td>' . $product['views'] . '</td>
+					<td>' . $product['date_add'] . '</td>
+					<td>' . $product['date_update'] . '</td>
 				</tr>';
         }
 
@@ -354,7 +356,8 @@ class Clarobi extends Module
                         ON DUPLICATE KEY UPDATE
                         `add_to_cart` = `add_to_cart` ' . (string)$operator_sign . ' ' . (int)$quantity;
 
-        if(!Db::getInstance()->execute($sqlInsert))
-            ClaroLogger::errorLog(__METHOD__.' : Query could not be executed.');
+        if (!Db::getInstance()->execute($sqlInsert)) {
+            ClaroLogger::errorLog(__METHOD__ . ' : Query could not be executed.');
+        }
     }
 }

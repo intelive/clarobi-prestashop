@@ -1,5 +1,5 @@
 {
-  "name": "clarobi/presta",
+  "name": "interlive/clarobi",
   "description": "PrestaShop module for ClaroBi analytics",
   "homepage": "https://clarobi.com/",
   "license": "",
@@ -14,7 +14,7 @@
   },
   "autoload": {
     "psr-4": {
-      "clarobi\\src\\Controller\\": "src/Controller/"
+      "clarobi\\Controller\\": "src/Controller/"
     }
   },
   "config": {

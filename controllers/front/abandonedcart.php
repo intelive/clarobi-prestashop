@@ -1,6 +1,30 @@
 <?php
+/**
+ * 2007-2020 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2020 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  International Registered Trademark & Property of PrestaShop SA
+ */
 
-include(_PS_MODULE_DIR_ . 'clarobi/controllers/front/api/api.php');
+include('api/api.php');
 
 class ClarobiAbandonedcartModuleFrontController extends ClarobiApiModuleFrontController
 {
@@ -35,8 +59,8 @@ class ClarobiAbandonedcartModuleFrontController extends ClarobiApiModuleFrontCon
         parent::init();
 
         // Sql to get last id from carts
-        $sql = 'SELECT c.id_cart FROM ps_cart c
-                    WHERE c.id_cart NOT IN (SELECT o.id_cart FROM ps_orders o)
+        $sql = 'SELECT c.id_cart FROM `'._DB_PREFIX_.'cart` c
+                    WHERE c.id_cart NOT IN (SELECT o.id_cart FROM `'._DB_PREFIX_.'orders` o)
                     ORDER BY c.id_cart DESC LIMIT 1';
         try {
             // Get orders
@@ -78,7 +102,6 @@ class ClarobiAbandonedcartModuleFrontController extends ClarobiApiModuleFrontCon
             $continue = true;
             // coll. items are less than the setup limit and last id is not exceeded
             while ($this->collItems < self::LIMIT && $continue) {
-
                 foreach ($this->collection->carts as $cart) {
                     // Get all carts that were NOT transformed into orders.
                     if (!in_array($cart->id, $this->orderCartId)) {
@@ -107,7 +130,6 @@ class ClarobiAbandonedcartModuleFrontController extends ClarobiApiModuleFrontCon
             $this->encodedJson['lastId'] = ($simpleAbandonedCart ? $simpleAbandonedCart['id'] : 0);
 
             die(json_encode($this->encodedJson));
-
         } catch (Exception $exception) {
             ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
@@ -140,6 +162,7 @@ class ClarobiAbandonedcartModuleFrontController extends ClarobiApiModuleFrontCon
                 $items[] = $cart_row;
             }
         }
+
         return ['cart_rows' => $items];
     }
 }

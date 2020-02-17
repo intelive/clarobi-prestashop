@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
-    <name>claroBi</name>
+    <name>clarobi</name>
     <displayName><![CDATA[ClaroBi]]></displayName>
-    <version><![CDATA[1.0.0]]></version>
-    <description><![CDATA[API to provide the necessary statistics for ClaroBi analytics that are not made available by PrestaShop]]></description>
+    <version><![CDATA[1.0.1]]></version>
+    <description><![CDATA[API to provide the necessary statistics for ClaroBi 
+                                                analytics that are not made available by PrestaShop]]></description>
     <author><![CDATA[Interlive Metrics]]></author>
     <tab><![CDATA[administration]]></tab>
 	<confirmUninstall><![CDATA[Are you sure you want to uninstall ClaroBi analytics and statistics?]]></confirmUninstall>

@@ -6,5 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'clarobi\\src\\Controller\\' => array($baseDir . '/src/Controller'),
+    'clarobi\\Controller\\' => array($baseDir . '/src/Controller'),
 );

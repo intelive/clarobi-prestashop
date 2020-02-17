@@ -4,17 +4,17 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit4e68674ade58b13363e846815166bdce
+class ComposerStaticInited6439900fc68bb31fa9df5d972a1822
 {
     public static $prefixLengthsPsr4 = array (
         'c' => 
         array (
-            'clarobi\\src\\Controller\\' => 23,
+            'clarobi\\Controller\\' => 19,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'clarobi\\src\\Controller\\' => 
+        'clarobi\\Controller\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src/Controller',
         ),
@@ -23,8 +23,8 @@ class ComposerStaticInit4e68674ade58b13363e846815166bdce
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit4e68674ade58b13363e846815166bdce::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit4e68674ade58b13363e846815166bdce::$prefixDirsPsr4;
+            $loader->prefixLengthsPsr4 = ComposerStaticInited6439900fc68bb31fa9df5d972a1822::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInited6439900fc68bb31fa9df5d972a1822::$prefixDirsPsr4;
 
         }, null, ClassLoader::class);
     }
