@@ -276,9 +276,11 @@ class Clarobi extends Module
 			<div class="alert alert-info">
 				<h4>Number of adds to cart compared to number of views</h4>
 				<p class="font-italic">'
-            . $this->trans('This are the calculated numbers since module installation.',
+            . $this->trans(
+                'This are the calculated numbers since module installation.',
                 array(),
-                'Modules.Clarobi.Admin')
+                'Modules.Clarobi.Admin'
+            )
             . '</p>
 			</div>';
         $this->html .= '

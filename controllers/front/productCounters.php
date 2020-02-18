@@ -116,7 +116,6 @@ class ClarobiProductCountersModuleFrontController extends ClarobiApiModuleFrontC
             $this->encodeJson('product_counter', 'PRODUCT_COUNTERS');
 
             die(json_encode($this->encodedJson));
-
         } catch (PrestaShopDatabaseException $exception) {
             ClaroLogger::errorLog(__METHOD__ . ' : DBException: ' . $exception->getMessage()
                 . ' at line ' . $exception->getLine());
