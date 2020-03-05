@@ -33,7 +33,7 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
     const DEBUG = false;
     const LIMIT = 50;
 
-    protected $json = [];
+    protected $jsonContent = [];
     protected $encodedJson = [];
     protected $collection;
     protected $collItems;
@@ -71,6 +71,9 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
         foreach ($groups as $group) {
             $this->groups[$group['id_group']] = $group['name'];
         }
+
+        // todo: Set to true to return Json
+//        $this->json = true;
     }
 
     /**
@@ -87,11 +90,11 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
         } catch (Exception $exception) {
             ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
-            $this->json = [
+            $this->jsonContent = [
                 'status' => 'error',
                 'error' => $exception->getMessage()
             ];
-            die(json_encode($this->json));
+            die(json_encode($this->jsonContent));
         }
     }
 
@@ -116,11 +119,11 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
         } catch (Exception $exception) {
             ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
-            $this->json = [
+            $this->jsonContent = [
                 'status' => 'error',
                 'error' => $exception->getMessage()
             ];
-            die(json_encode($this->json));
+            die(json_encode($this->jsonContent));
         }
         // Output collection in derived class
     }
@@ -134,7 +137,7 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
      */
     protected function encodeJson($entityName, $type = null)
     {
-        $data = $this->json;
+        $data = $this->jsonContent;
         $responseIsEncoded = $responseIsCompressed = false;
 
         // Encode and compress the data only if we have it

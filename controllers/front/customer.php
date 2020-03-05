@@ -54,33 +54,37 @@ class ClarobiCustomerModuleFrontController extends ClarobiApiModuleFrontControll
         parent::initContent();
 
         try {
-            foreach ($this->collection->customers as $customer) {
-                // Remove unnecessary keys
-                $simpleCustomer = $this->simpleMapping->getSimpleMapping('customer', $customer);
+            $customer = false;
 
-                // Assign entity_name attribute
-                $simpleCustomer['entity_name'] = 'customer';
-                // Fields that are not available in collection
-                $simpleCustomer['group'] = $this->groups[$customer->id_default_group];
+            if (isset($this->collection->customers)) {
+                foreach ($this->collection->customers as $customer) {
+                    // Remove unnecessary keys
+                    $simpleCustomer = $this->simpleMapping->getSimpleMapping('customer', $customer);
 
-                $customerObject = new Customer($customer->id);
+                    // Assign entity_name attribute
+                    $simpleCustomer['entity_name'] = 'customer';
+                    // Fields that are not available in collection
+                    $simpleCustomer['group'] = $this->groups[$customer->id_default_group];
 
-                $id_address = (!empty($customerObject->getAddresses(1))
-                    ? $customerObject->getAddresses(1)[0]['id_address'] : null);
-                $address = $this->getAddress($id_address);
+                    $customerObject = new Customer($customer->id);
 
-                $simpleCustomer['bill_country'] = $address['country'];
-                $simpleCustomer['ship_country'] = $address['country'];
+                    $id_address = (!empty($customerObject->getAddresses(1))
+                        ? $customerObject->getAddresses(1)[0]['id_address'] : null);
+                    $address = $this->getAddress($id_address);
 
-                // Fields that need to be add
-                $simpleCustomer['source'] = '(untracked)';
-                $simpleCustomer['medium'] = '(untracked)';
-                $simpleCustomer['campaign'] = '(untracked)';
-                $simpleCustomer['content'] = '(untracked)';
-                $simpleCustomer['gclid'] = '(untracked)';
+                    $simpleCustomer['bill_country'] = $address['country'];
+                    $simpleCustomer['ship_country'] = $address['country'];
 
-                // Set to json
-                $this->json[] = $simpleCustomer;
+                    // Fields that need to be add
+                    $simpleCustomer['source'] = '(untracked)';
+                    $simpleCustomer['medium'] = '(untracked)';
+                    $simpleCustomer['campaign'] = '(untracked)';
+                    $simpleCustomer['content'] = '(untracked)';
+                    $simpleCustomer['gclid'] = '(untracked)';
+
+                    // Add to jsonContent
+                    $this->jsonContent[] = $simpleCustomer;
+                }
             }
 
             // call encoder
@@ -92,10 +96,10 @@ class ClarobiCustomerModuleFrontController extends ClarobiApiModuleFrontControll
         } catch (Exception $exception) {
             ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
-            $this->json = [
+            $this->jsonContent = [
                 'status' => 'error',
                 'error' => $exception->getMessage()];
-            die(json_encode($this->json));
+            die(json_encode($this->jsonContent));
         }
     }
 }

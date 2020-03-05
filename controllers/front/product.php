@@ -24,6 +24,8 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
+use Symfony\Component\HttpFoundation\JsonResponse;
+
 include('api/api.php');
 
 class ClarobiProductModuleFrontController extends ClarobiApiModuleFrontController
@@ -54,17 +56,22 @@ class ClarobiProductModuleFrontController extends ClarobiApiModuleFrontControlle
         parent::initContent();
 
         try {
-            foreach ($this->collection->products as $product) {
-                // Remove unnecessary keys
-                $simpleProduct = $this->simpleMapping->getSimpleMapping('product', $product);
+            $product = null;
 
-                // Assign entity_name attribute
-                $simpleProduct['entity_name'] = 'product';
-                $simpleProduct['options'] = $this->assotiationsOptionsMapping($product);
+            if(isset($this->collection->products)){
+                foreach ($this->collection->products as $product) {
+                    // Remove unnecessary keys
+                    $simpleProduct = $this->simpleMapping->getSimpleMapping('product', $product);
 
-                // Set to json
-                $this->json[] = $simpleProduct;
+                    // Assign entity_name attribute
+                    $simpleProduct['entity_name'] = 'product';
+                    $simpleProduct['options'] = $this->assotiationsOptionsMapping($product);
+
+                    // Add to jsonContent
+                    $this->jsonContent[] = $simpleProduct;
+                }
             }
+
             // call encoder
             $this->encodeJson('product');
             /** @var Product $product */
@@ -74,11 +81,11 @@ class ClarobiProductModuleFrontController extends ClarobiApiModuleFrontControlle
         } catch (Exception $exception) {
             ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
-            $this->json = [
+            $this->jsonContent = [
                 'status' => 'error',
                 'error' => $exception->getMessage()
             ];
-            die(json_encode($this->json));
+            die(json_encode($this->jsonContent));
         }
     }
 

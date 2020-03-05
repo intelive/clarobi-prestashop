@@ -54,24 +54,28 @@ class ClarobiInvoiceModuleFrontController extends ClarobiApiModuleFrontControlle
         parent::initContent();
 
         try {
-            foreach ($this->collection->order_invoices as $invoice) {
-                // Remove unnecessary keys
-                $simpleInvoice = $this->simpleMapping->getSimpleMapping('order_invoice', $invoice);
+            $invoice = false;
 
-                // Assign entity_name attribute
-                $simpleInvoice['entity_name'] = 'sales_invoice';
+            if (isset($this->collection->order_invoices)) {
+                foreach ($this->collection->order_invoices as $invoice) {
+                    // Remove unnecessary keys
+                    $simpleInvoice = $this->simpleMapping->getSimpleMapping('order_invoice', $invoice);
 
-                /** @var OrderInvoice $invoiceObject */
-                $invoiceObject = new OrderInvoice($invoice->id);
+                    // Assign entity_name attribute
+                    $simpleInvoice['entity_name'] = 'sales_invoice';
 
-                $result = $this->invoiceProductsMapping($invoiceObject);
+                    /** @var OrderInvoice $invoiceObject */
+                    $invoiceObject = new OrderInvoice($invoice->id);
 
-                $simpleInvoice['id_shop'] = $result['id_shop'];
-                $simpleInvoice['items'] = $result['items'];
-                $simpleInvoice['currency_code'] = $this->getCurrencyISOFromId($invoiceObject->getOrder()->id_currency);
+                    $result = $this->invoiceProductsMapping($invoiceObject);
 
-                // Set to json
-                $this->json[] = $simpleInvoice;
+                    $simpleInvoice['id_shop'] = $result['id_shop'];
+                    $simpleInvoice['items'] = $result['items'];
+                    $simpleInvoice['currency_code'] = $this->getCurrencyISOFromId($invoiceObject->getOrder()->id_currency);
+
+                    // Add to jsonContent
+                    $this->jsonContent[] = $simpleInvoice;
+                }
             }
 
             // call encoder
@@ -83,11 +87,11 @@ class ClarobiInvoiceModuleFrontController extends ClarobiApiModuleFrontControlle
         } catch (Exception $exception) {
             ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
-            $this->json = [
+            $this->jsonContent = [
                 'status' => 'error',
                 'error' => $exception->getMessage()
             ];
-            die(json_encode($this->json));
+            die(json_encode($this->jsonContent));
         }
     }
 

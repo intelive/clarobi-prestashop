@@ -262,7 +262,6 @@ class Clarobi extends Module
         return [];
     }
 
-
     /*
      * Display statistics in admin panel.
      */
@@ -339,7 +338,6 @@ class Clarobi extends Module
 
         $this->insertUpdateAddToCartClaro($id_product, $quantity, $operator);
     }
-
 
     /**
      * Insert/Update quantity in module table on cart-update-quantity.

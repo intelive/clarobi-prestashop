@@ -27,6 +27,11 @@
 include(_PS_ROOT_DIR_ . '/modules/statsproduct/statsproduct.php');
 include('api/api.php');
 
+/**
+ * Class ClarobiProductCountersModuleFrontController
+ *
+ *
+ */
 class ClarobiProductCountersModuleFrontController extends ClarobiApiModuleFrontController
 {
     protected $counters;
@@ -46,7 +51,7 @@ class ClarobiProductCountersModuleFrontController extends ClarobiApiModuleFrontC
     {
         parent::init();
 
-        $this->json['date'] = date('Y-m-d H:i:s', time());
+        $this->jsonContent['date'] = date('Y-m-d H:i:s', time());
 
         try {
             $sql = 'SELECT cp.`id_product` FROM `' . _DB_PREFIX_ . 'clarobi_products` cp';
@@ -68,11 +73,11 @@ class ClarobiProductCountersModuleFrontController extends ClarobiApiModuleFrontC
         } catch (PrestaShopDatabaseException $exception) {
             ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
-            $this->json = [
+            $this->jsonContent = [
                 'status' => 'error',
                 'error' => $exception->getMessage()
             ];
-            die(json_encode($this->json));
+            die(json_encode($this->jsonContent));
         }
     }
 
@@ -88,7 +93,7 @@ class ClarobiProductCountersModuleFrontController extends ClarobiApiModuleFrontC
          */
 
         try {
-            $this->json = [
+            $this->jsonContent = [
                 'date' => date('Y-m-d H:i:s', time()),
                 'counters' => []
             ];
@@ -109,7 +114,7 @@ class ClarobiProductCountersModuleFrontController extends ClarobiApiModuleFrontC
                         'viewed' => $row['add_to_cart']
                     ];
                 }
-                $this->json['counters'] = $this->counters;
+                $this->jsonContent['counters'] = $this->counters;
             }
 
             // call encoder
@@ -120,11 +125,11 @@ class ClarobiProductCountersModuleFrontController extends ClarobiApiModuleFrontC
             ClaroLogger::errorLog(__METHOD__ . ' : DBException: ' . $exception->getMessage()
                 . ' at line ' . $exception->getLine());
 
-            $this->json = [
+            $this->jsonContent = [
                 'status' => 'error',
                 'message' => $exception->getMessage()
             ];
-            die(json_encode($this->json));
+            die(json_encode($this->jsonContent));
         }
     }
 }

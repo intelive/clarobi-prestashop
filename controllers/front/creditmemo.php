@@ -54,27 +54,31 @@ class ClarobiCreditmemoModuleFrontController extends ClarobiApiModuleFrontContro
         parent::initContent();
 
         try {
-            foreach ($this->collection->order_slips as $order_slip) {
-                // Remove unnecessary keys
-                $simpleOrderSlip = $this->simpleMapping->getSimpleMapping('order_slip', $order_slip);
+            $order_slip = false;
 
-                // Assign entity_name attribute
-                $simpleOrderSlip['entity_name'] = 'sales_creditnote';
+            if (isset($this->collection->order_slips)) {
+                foreach ($this->collection->order_slips as $order_slip) {
+                    // Remove unnecessary keys
+                    $simpleOrderSlip = $this->simpleMapping->getSimpleMapping('order_slip', $order_slip);
 
-                /** @var Order $order */
-                $order = new Order($order_slip->id_order);
-                $simpleOrderSlip['currency_code'] = $this->getCurrencyISOFromId($order->id_currency);
+                    // Assign entity_name attribute
+                    $simpleOrderSlip['entity_name'] = 'sales_creditnote';
 
-                /** @var OrderSlip $orderSlipObject */
-                $orderSlipObject = new OrderSlip($order_slip->id);
+                    /** @var Order $order */
+                    $order = new Order($order_slip->id_order);
+                    $simpleOrderSlip['currency_code'] = $this->getCurrencyISOFromId($order->id_currency);
 
-                $result = $this->orderSlipProducts($orderSlipObject);
+                    /** @var OrderSlip $orderSlipObject */
+                    $orderSlipObject = new OrderSlip((int)$order_slip->id);
 
-                $simpleOrderSlip['id_shop'] = $result['id_shop'];
-                $simpleOrderSlip['associations']->order_slip_details = $result['items'];
+                    $result = $this->orderSlipProducts($orderSlipObject);
 
-                // Set to json
-                $this->json[] = $simpleOrderSlip;
+                    $simpleOrderSlip['id_shop'] = $result['id_shop'];
+                    $simpleOrderSlip['associations']->order_slip_details = $result['items'];
+
+                    // Add to jsonContent
+                    $this->jsonContent[] = $simpleOrderSlip;
+                }
             }
 
             // call encoder
@@ -86,11 +90,11 @@ class ClarobiCreditmemoModuleFrontController extends ClarobiApiModuleFrontContro
         } catch (Exception $exception) {
             ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
-            $this->json = [
+            $this->jsonContent = [
                 'status' => 'error',
                 'error' => $exception->getMessage()
             ];
-            die(json_encode($this->json));
+            die(json_encode($this->jsonContent));
         }
     }
 

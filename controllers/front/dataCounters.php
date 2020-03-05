@@ -26,6 +26,11 @@
 
 include('api/api.php');
 
+/**
+ * Class ClarobiDataCountersModuleFrontController
+ *
+ *
+ */
 class ClarobiDataCountersModuleFrontController extends ClarobiApiModuleFrontController
 {
     protected $sql;
@@ -80,19 +85,19 @@ class ClarobiDataCountersModuleFrontController extends ClarobiApiModuleFrontCont
             try {
                 $result = Db::getInstance()->executeS($query);
                 if (isset($result)) {
-                    $this->json[$key] = $result[0][$key];
+                    $this->jsonContent[$key] = $result[0][$key];
                 }
             } catch (PrestaShopDatabaseException $exception) {
                 ClaroLogger::errorLog(__METHOD__ . ' : DBException: ' . $exception->getMessage()
                     . ' at line ' . $exception->getLine());
 
-                $this->json = [
+                $this->jsonContent = [
                     'status' => 'error',
                     'error' => $exception->getMessage()
                 ];
-                die(json_encode($this->json));
+                die(json_encode($this->jsonContent));
             }
         }
-        die(json_encode($this->json));
+        die(json_encode($this->jsonContent));
     }
 }

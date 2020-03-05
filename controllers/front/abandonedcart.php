@@ -68,9 +68,11 @@ class ClarobiAbandonedcartModuleFrontController extends ClarobiApiModuleFrontCon
                 'url' => $this->utils->createUrlWithQuery($this->shopDomain . '/api/orders', $this->getCartIdFromOrders)
             ]));
 
-            // Get all carts ids that have an order associated.
-            foreach ($this->orders->orders as $order) {
-                $this->orderCartId[] = $order->id_cart;
+            if(isset($this->orders->orders)){
+                // Get all carts ids that have an order associated.
+                foreach ($this->orders->orders as $order) {
+                    $this->orderCartId[] = $order->id_cart;
+                }
             }
 
             $result = $result = Db::getInstance()->executeS($sql);
@@ -81,11 +83,11 @@ class ClarobiAbandonedcartModuleFrontController extends ClarobiApiModuleFrontCon
         } catch (Exception $exception) {
             ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
-            $this->json = [
+            $this->jsonContent = [
                 'status' => 'error',
                 'error' => $exception->getMessage()
             ];
-            die(json_encode($this->json));
+            die(json_encode($this->jsonContent));
         }
 
         return true;
@@ -100,28 +102,31 @@ class ClarobiAbandonedcartModuleFrontController extends ClarobiApiModuleFrontCon
 
         try {
             $continue = true;
+            $simpleAbandonedCart = false;
+
             // coll. items are less than the setup limit and last id is not exceeded
             while ($this->collItems < self::LIMIT && $continue) {
-                foreach ($this->collection->carts as $cart) {
-                    // Get all carts that were NOT transformed into orders.
-                    if (!in_array($cart->id, $this->orderCartId)) {
-                        // Remove unnecessary keys
-                        $simpleAbandonedCart = $this->simpleMapping->getSimpleMapping('abandoned_cart', $cart);
+                if(isset($this->collection->carts)){
+                    foreach ($this->collection->carts as $cart) {
+                        // Get all carts that were NOT transformed into orders.
+                        if (!in_array($cart->id, $this->orderCartId)) {
+                            // Remove unnecessary keys
+                            $simpleAbandonedCart = $this->simpleMapping->getSimpleMapping('abandoned_cart', $cart);
 
-                        // Assign entity_name attribute
-                        $simpleAbandonedCart['entity_name'] = 'abandonedcart';
-                        $simpleAbandonedCart['associations'] = $this->associationsCartRowsMapping($cart);
+                            // Assign entity_name attribute
+                            $simpleAbandonedCart['entity_name'] = 'abandonedcart';
+                            $simpleAbandonedCart['associations'] = $this->associationsCartRowsMapping($cart);
 
-                        // Add to json
-                        $this->json[] = $simpleAbandonedCart;
-                        // Increment coll items count
-                        $this->collItems++;
+                            // Add to jsonContent
+                            $this->jsonContent[] = $simpleAbandonedCart;
+                            // Increment coll items count
+                            $this->collItems++;
+                        }
                     }
+                    // Verify if the last id is exceeded
+                    $continue = ($cart->id < $this->lastId ? true : false);
+                    ($continue ? $this->collection = $this->getCollection($cart->id, self::LIMIT - $this->collItems) : '');
                 }
-
-                // Verify if the last id is exceeded
-                $continue = ($cart->id < $this->lastId ? true : false);
-                ($continue ? $this->collection = $this->getCollection($cart->id, self::LIMIT - $this->collItems) : '');
             }
 
             // call encoder
@@ -133,11 +138,11 @@ class ClarobiAbandonedcartModuleFrontController extends ClarobiApiModuleFrontCon
         } catch (Exception $exception) {
             ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
-            $this->json = [
+            $this->jsonContent = [
                 'status' => 'error',
                 'error' => $exception->getMessage()
             ];
-            die(json_encode($this->json));
+            die(json_encode($this->jsonContent));
         }
     }
 

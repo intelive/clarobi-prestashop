@@ -51,20 +51,22 @@ class ClarobiStockModuleFrontController extends ClarobiApiModuleFrontController
     public function initContent()
     {
         try {
-            $this->json = [
+            $this->jsonContent = [
                 'date' => date('Y-m-d H:i:s', time()),
                 'stock' => []
             ];
 
             $this->collection = $this->getCollection();
 
-            foreach ($this->collection->stock_availables as $stock_available) {
-                if ($stock_available->id_product_attribute == 0) {
-                    // Remove unnecessary keys
-                    $simpleStockAvailable = $this->simpleMapping->getSimpleMapping('stock_available', $stock_available);
+            if (isset($this->collection->stock_availables)) {
+                foreach ($this->collection->stock_availables as $stock_available) {
+                    if ($stock_available->id_product_attribute == 0) {
+                        // Remove unnecessary keys
+                        $simpleStockAvailable = $this->simpleMapping->getSimpleMapping('stock_available', $stock_available);
 
-                    // Set to json
-                    $this->json['stock'][] = $simpleStockAvailable;
+                        // Add to jsonContent
+                        $this->jsonContent['stock'][] = $simpleStockAvailable;
+                    }
                 }
             }
 
@@ -75,11 +77,11 @@ class ClarobiStockModuleFrontController extends ClarobiApiModuleFrontController
         } catch (Exception $exception) {
             ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());
 
-            $this->json = [
+            $this->jsonContent = [
                 'status' => 'error',
                 'error' => $exception->getMessage()
             ];
-            die(json_encode($this->json));
+            die(json_encode($this->jsonContent));
         }
     }
 }
