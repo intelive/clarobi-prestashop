@@ -62,7 +62,10 @@ class ClarobiStockModuleFrontController extends ClarobiApiModuleFrontController
                 foreach ($this->collection->stock_availables as $stock_available) {
                     if ($stock_available->id_product_attribute == 0) {
                         // Remove unnecessary keys
-                        $simpleStockAvailable = $this->simpleMapping->getSimpleMapping('stock_available', $stock_available);
+                        $simpleStockAvailable = $this->simpleMapping->getSimpleMapping(
+                            'stock_available',
+                            $stock_available
+                        );
 
                         // Add to jsonContent
                         $this->jsonContent['stock'][] = $simpleStockAvailable;

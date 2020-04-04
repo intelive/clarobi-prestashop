@@ -71,7 +71,9 @@ class ClarobiInvoiceModuleFrontController extends ClarobiApiModuleFrontControlle
 
                     $simpleInvoice['id_shop'] = $result['id_shop'];
                     $simpleInvoice['items'] = $result['items'];
-                    $simpleInvoice['currency_code'] = $this->getCurrencyISOFromId($invoiceObject->getOrder()->id_currency);
+                    $simpleInvoice['currency_code'] = $this->getCurrencyISOFromId(
+                        $invoiceObject->getOrder()->id_currency
+                    );
 
                     // Add to jsonContent
                     $this->jsonContent[] = $simpleInvoice;

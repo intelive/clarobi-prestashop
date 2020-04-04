@@ -52,7 +52,7 @@ class ClarobiExchangerateModuleFrontController extends ClarobiApiModuleFrontCont
 
             $this->collection = $this->getCollection();
 
-            if (isset($this->collection->currencies)){
+            if (isset($this->collection->currencies)) {
                 /** @var Currency $currency */
                 foreach ($this->collection->currencies as $currency) {
                     // Add to jsonContent

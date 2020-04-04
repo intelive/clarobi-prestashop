@@ -58,7 +58,7 @@ class ClarobiProductModuleFrontController extends ClarobiApiModuleFrontControlle
         try {
             $product = null;
 
-            if(isset($this->collection->products)){
+            if (isset($this->collection->products)) {
                 foreach ($this->collection->products as $product) {
                     // Remove unnecessary keys
                     $simpleProduct = $this->simpleMapping->getSimpleMapping('product', $product);

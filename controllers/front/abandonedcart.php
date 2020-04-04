@@ -18,9 +18,9 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author    PrestaShop SA <contact@prestashop.com>
- *  @copyright 2007-2020 PrestaShop SA
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ * @author    PrestaShop SA <contact@prestashop.com>
+ * @copyright 2007-2020 PrestaShop SA
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
@@ -59,8 +59,8 @@ class ClarobiAbandonedcartModuleFrontController extends ClarobiApiModuleFrontCon
         parent::init();
 
         // Sql to get last id from carts
-        $sql = 'SELECT c.id_cart FROM `'._DB_PREFIX_.'cart` c
-                    WHERE c.id_cart NOT IN (SELECT o.id_cart FROM `'._DB_PREFIX_.'orders` o)
+        $sql = 'SELECT c.id_cart FROM `' . _DB_PREFIX_ . 'cart` c
+                    WHERE c.id_cart NOT IN (SELECT o.id_cart FROM `' . _DB_PREFIX_ . 'orders` o)
                     ORDER BY c.id_cart DESC LIMIT 1';
         try {
             // Get orders
@@ -68,7 +68,7 @@ class ClarobiAbandonedcartModuleFrontController extends ClarobiApiModuleFrontCon
                 'url' => $this->utils->createUrlWithQuery($this->shopDomain . '/api/orders', $this->getCartIdFromOrders)
             ]));
 
-            if(isset($this->orders->orders)){
+            if (isset($this->orders->orders)) {
                 // Get all carts ids that have an order associated.
                 foreach ($this->orders->orders as $order) {
                     $this->orderCartId[] = $order->id_cart;
@@ -106,7 +106,7 @@ class ClarobiAbandonedcartModuleFrontController extends ClarobiApiModuleFrontCon
 
             // coll. items are less than the setup limit and last id is not exceeded
             while ($this->collItems < self::LIMIT && $continue) {
-                if(isset($this->collection->carts)){
+                if (isset($this->collection->carts)) {
                     foreach ($this->collection->carts as $cart) {
                         // Get all carts that were NOT transformed into orders.
                         if (!in_array($cart->id, $this->orderCartId)) {
@@ -125,7 +125,9 @@ class ClarobiAbandonedcartModuleFrontController extends ClarobiApiModuleFrontCon
                     }
                     // Verify if the last id is exceeded
                     $continue = ($cart->id < $this->lastId ? true : false);
-                    ($continue ? $this->collection = $this->getCollection($cart->id, self::LIMIT - $this->collItems) : '');
+                    if ($continue) {
+                        $this->collection = $this->getCollection($cart->id, self::LIMIT - $this->collItems);
+                    }
                 }
             }
 
