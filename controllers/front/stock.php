@@ -66,9 +66,13 @@ class ClarobiStockModuleFrontController extends ClarobiApiModuleFrontController
                             'stock_available',
                             $stock_available
                         );
+                        $mappedStock = [
+                            'id' => $simpleStockAvailable['id_product'],
+                            's' => $simpleStockAvailable['quantity']
+                        ];
 
                         // Add to jsonContent
-                        $this->jsonContent['stock'][] = $simpleStockAvailable;
+                        $this->jsonContent['stock'][] = $mappedStock;
                     }
                 }
             }

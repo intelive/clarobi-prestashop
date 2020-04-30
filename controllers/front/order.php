@@ -119,15 +119,51 @@ class ClarobiOrderModuleFrontController extends ClarobiApiModuleFrontController
     {
         $items = [];
         foreach ($order->associations->order_rows as $order_row) {
+
+            /**
+             * @todo add options for each product in order
+             * "options":{
+             *      "attribute_id": "1",
+             *      "item_id": "381", #order item id,
+             *      "label": "Manufacturer",
+             *      "value": "Made In China"
+             * }
+             */
             $order_row->categories = $this->getCategoryPathTree($order_row->product_id);
             /** @var Product $product */
             $product = new Product($order_row->product_id);
             $type = (!empty($product->getAttributeCombinations()) ? 'configurable' : $product->getWsType());
             $order_row->product_type = $type;
 
+            $order_row->options = $this->getProductOptions($product);
+
             $items[] = $order_row;
         }
 
         return $items;
+    }
+
+    /**
+     * Get product options.
+     *
+     * @param Product $product
+     * @return array
+     * @throws Exception
+     */
+    private function getProductOptions($product)
+    {
+        $options = [];
+
+        if ($product->getAttributeCombinations()) {
+            foreach ($product->getAttributeCombinations() as $attributeCombination) {
+                $options[] = [
+                    'attribute_id' => $attributeCombination['id_attribute'],
+                    'label' => $attributeCombination['group_name'],
+                    'value' => $attributeCombination['attribute_name']
+                ];
+            }
+        }
+
+        return $options;
     }
 }

@@ -72,8 +72,11 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
             $this->groups[$group['id_group']] = $group['name'];
         }
 
-        // todo: Set to true to return Json
-//        $this->json = true;
+        /**
+         * todo: Set to true to set header-> Content-Type: application/json
+         *      note: not working
+         * $this->json = true;
+         */
     }
 
     /**
@@ -159,6 +162,7 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
         $this->encodedJson = [
             'isEncoded' => $responseIsEncoded,
             'isCompressed' => $responseIsCompressed,
+//            'rawData' => $this->jsonContent,
             'data' => $data,
             'license_key' => Configuration::get('CLAROBI_LICENSE_KEY'),
             'entity' => $entityName,
