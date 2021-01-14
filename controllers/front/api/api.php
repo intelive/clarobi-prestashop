@@ -62,6 +62,9 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
     // Customers groups as id => name array
     protected $groups;
 
+    /**
+     * ClarobiApiModuleFrontController constructor.
+     */
     public function __construct()
     {
         parent::__construct();
@@ -120,7 +123,7 @@ class ClarobiApiModuleFrontController extends ClarobiApiAuthModuleFrontControlle
                 throw new Exception('Parameter \'from_id\' not found!');
             }
 
-            // todo make collection to return 50 items not filter[id]=[fromId, fromId+50] - incorrect
+            // make collection to return 50 items not filter[id]=[fromId, fromId+50] - incorrect
             $this->collection = $this->getCollection($from_id, null);
         } catch (Exception $exception) {
             ClaroLogger::errorLog(__METHOD__ . ' : ' . $exception->getMessage() . ' at line ' . $exception->getLine());

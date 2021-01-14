@@ -43,7 +43,7 @@ function upgrade_module_1_0_1()
             (`name`,`width`,`height`,`products`,`categories`,`manufacturers`,`suppliers`,`stores`) 
             VALUES (\'' . $new_image_type . '\',100,100,1,0,0,0,0)';
 
-    // todo maybe add sql to set to 0 others than the products column - if the number of the columns will change
+    // maybe add sql to set to 0 others than the products column - if the number of the columns will change
 
     return Db::getInstance()->execute($sql);
 }

@@ -27,8 +27,6 @@
 * to avoid any conflicts with others containers.
 */
 
-use Symfony\Component\HttpFoundation\JsonResponse;
-
 include('api/api.php');
 
 class ClarobiProductModuleFrontController extends ClarobiApiModuleFrontController

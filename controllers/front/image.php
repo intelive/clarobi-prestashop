@@ -39,6 +39,9 @@ class ClarobiImageModuleFrontController extends ModuleFrontController
     // Add claro default image type - since presta doesn't know about it
     protected $image_types = ['clarobi_default'];
 
+    /**
+     * ClarobiImageModuleFrontController constructor.
+     */
     public function __construct()
     {
         parent::__construct();
@@ -61,6 +64,9 @@ class ClarobiImageModuleFrontController extends ModuleFrontController
         }
     }
 
+    /**
+     * Handling GET requests can be done by implementing this method.
+     */
     public function initContent()
     {
         try {

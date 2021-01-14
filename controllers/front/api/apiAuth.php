@@ -39,6 +39,9 @@ abstract class ClarobiApiAuthModuleFrontController extends ModuleFrontController
         parent::__construct();
     }
 
+    /**
+     * @throws PrestaShopException
+     */
     public function init()
     {
         parent::init();

@@ -18,9 +18,9 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author    PrestaShop SA <contact@prestashop.com>
- *  @copyright 2007-2021 PrestaShop SA
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ * @author    PrestaShop SA <contact@prestashop.com>
+ * @copyright 2007-2021 PrestaShop SA
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  *
  * Don't forget to prefix your containers with your own identifier
@@ -99,9 +99,6 @@ class ClaroHelper
             function_exists('gzcompress') &&
             function_exists('base64_encode')
         ) {
-//            return gzcompress(serialize(($data)));
-            $result = mb_convert_encoding($data, "UTF-8", "BASE64");
-            $result = mb_convert_encoding($data, "BASE64", "UTF-8");
             return base64_encode(gzcompress(serialize(($data))));
         } else {
             ClaroLogger::errorLog(__METHOD__ . ' : ' . 'Extensions zlib or gzcompress or base64_encode do not exist');
@@ -121,7 +118,6 @@ class ClaroHelper
         $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
         $encrypted = openssl_encrypt(json_encode($payload), 'aes-256-cbc', $this->secret, 0, $iv);
 
-//        return ($encrypted . '::' . $iv);
         return base64_encode($encrypted . '::' . $iv);
     }
 
@@ -133,7 +129,6 @@ class ClaroHelper
      */
     public function decode($payload)
     {
-//        list($encryptedData, $iv) = explode('::', base64_decode($payload), 2);
         list($encryptedData, $iv) = explode('::', $payload, 2);
 
         return json_decode(openssl_decrypt($encryptedData, 'aes-256-cbc', $this->secret, 0, $iv));

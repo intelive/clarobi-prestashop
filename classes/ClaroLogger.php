@@ -36,6 +36,6 @@ class ClaroLogger
      */
     public static function errorLog($message)
     {
-        error_log($message . "( " . date('Y-m-d H:i:s') . " )\n", 3, _PS_MODULE_DIR_ . 'clarobi/errors.log');
+        error_log($message . "( " . date('Y-m-d H:i:s') . " )\n", 3, _PS_ROOT_DIR_ . '/var/logs/clarobi_errors.log');
     }
 }

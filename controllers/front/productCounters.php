@@ -30,11 +30,6 @@
 include(_PS_ROOT_DIR_ . '/modules/statsproduct/statsproduct.php');
 include('api/api.php');
 
-/**
- * Class ClarobiProductCountersModuleFrontController
- *
- *
- */
 class ClarobiProductCountersModuleFrontController extends ClarobiApiModuleFrontController
 {
     protected $counters;

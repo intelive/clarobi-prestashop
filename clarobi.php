@@ -38,6 +38,9 @@ class Clarobi extends Module
 {
     private $html = '';
 
+    /**
+     * Clarobi constructor.
+     */
     public function __construct()
     {
         $this->name = 'clarobi';
@@ -71,8 +74,6 @@ class Clarobi extends Module
      */
     public function install()
     {
-//        Configuration::updateValue('CLAROBI_LIVE_MODE', false);
-
         include(dirname(__FILE__) . '/sql/install.php');
 
         // Set Clarobi configurations

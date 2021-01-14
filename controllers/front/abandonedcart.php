@@ -40,7 +40,6 @@ class ClarobiAbandonedcartModuleFrontController extends ClarobiApiModuleFrontCon
         'sort' => 'id_cart_ASC'
     ];
 
-
     /**
      * ClarobiAbandonedCartsModuleFrontController constructor.
      */

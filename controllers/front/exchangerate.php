@@ -31,17 +31,26 @@ include('api/api.php');
 
 class ClarobiExchangerateModuleFrontController extends ClarobiApiModuleFrontController
 {
+    /**
+     * ClarobiExchangerateModuleFrontController constructor.
+     */
     public function __construct()
     {
         parent::__construct();
         $this->url = $this->shopDomain . '/api/currencies';
     }
 
+    /**
+     * @throws PrestaShopException
+     */
     public function init()
     {
         parent::init();
     }
 
+    /**
+     * Handling GET requests can be done by implementing this method.
+     */
     public function initContent()
     {
         try {
@@ -50,7 +59,7 @@ class ClarobiExchangerateModuleFrontController extends ClarobiApiModuleFrontCont
                 'data' => []
             ];
 
-            // todo other way of setting base currency is to provide input in configuration form
+            // other way of setting base currency is to provide input in configuration form
             $base_currency = Currency::getDefaultCurrency();
 
             $this->collection = $this->getCollection();

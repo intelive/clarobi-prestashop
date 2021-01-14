@@ -29,11 +29,6 @@
 
 include('api/api.php');
 
-/**
- * Class ClarobiDataCountersModuleFrontController
- *
- *
- */
 class ClarobiDataCountersModuleFrontController extends ClarobiApiModuleFrontController
 {
     protected $sql;
