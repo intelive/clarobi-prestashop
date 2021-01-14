@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2020 PrestaShop
+ * 2007-2021 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -18,10 +18,13 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2020 PrestaShop SA
- * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2021 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
+ *
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
  */
 
 class ClaroMapping
@@ -34,8 +37,8 @@ class ClaroMapping
             'date_upd', 'reset_password_token', 'reset_password_validity', 'associations'
         ],
         'product' => [
-//            'id_supplier', 'id_default_combination', 'id_shop_default', 'reference', 'supplier_reference', 'is_virtual',
-//            'on_sale', 'online_only', 'price', 'condition', 'date_add', 'date_upd', 'associations',
+//            'id_supplier', 'id_default_combination', 'id_shop_default', 'reference', 'supplier_reference',
+//            'is_virtual', 'on_sale', 'online_only', 'price', 'condition', 'date_add', 'date_upd', 'associations',
             'id_manufacturer', 'id_category_default', 'new', 'cache_default_attribute', 'id_default_image',
             'id_tax_rules_group', 'position_in_category', 'manufacturer_name', 'location', 'width', 'height', 'depth',
             'weight', 'quantity_discount', 'ean13', 'isbn', 'upc', 'cache_is_pack', 'cache_has_attachments', 'state',
